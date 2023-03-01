@@ -2,6 +2,7 @@ package com.example.kotlinworkmanager
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.Observer
 import androidx.work.*
 import java.util.concurrent.TimeUnit
 
@@ -33,5 +34,29 @@ class MainActivity : AppCompatActivity() {
 
         WorkManager.getInstance(this).enqueue(workRequestTwo)
 
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(workRequest.id)
+            .observe(this, Observer {
+                if (it.state == WorkInfo.State.RUNNING) {
+                    println("running")
+                } else if (it.state == WorkInfo.State.FAILED) {
+                    println("failed")
+                } else if (it.state == WorkInfo.State.SUCCEEDED) {
+                    println("succeeded")
+                }
+            })
+
+        //work mananger iptal etme
+        WorkManager.getInstance(this).cancelAllWork()
+
+        //chaining
+        val oneTimeRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<RefreshDatabase>()
+            .setConstraints(constraints)
+            .setInputData(data)
+            .build()
+
+        WorkManager.getInstance(this).beginWith(oneTimeRequest)
+            .then(oneTimeRequest)
+            .then(oneTimeRequest)
+            .enqueue()
     }
 }
