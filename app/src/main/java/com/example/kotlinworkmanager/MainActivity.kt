@@ -24,5 +24,14 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         WorkManager.getInstance(this).enqueue(workRequest)
+
+        val workRequestTwo: PeriodicWorkRequest =
+            PeriodicWorkRequestBuilder<RefreshDatabase>(15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .setInputData(data)
+                .build()
+
+        WorkManager.getInstance(this).enqueue(workRequestTwo)
+
     }
 }
